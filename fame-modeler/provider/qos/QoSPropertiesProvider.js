@@ -45,7 +45,7 @@ export default function QoSPropertiesProvider(propertiesPanel, translate) {
         groups.push(createqosGroup(element, translate));
       }
 
-      groups = groups.filter(el => (!el.id.includes('Camunda') || el.id.includes('CallActivity')|| el.id.includes('Script'))); //excludes unused panels
+      groups = groups.filter(el => (el.id.includes('Condition') || !el.id.includes('Camunda') || el.id.includes('CallActivity')|| el.id.includes('Script'))); //excludes unused panels
 
       return groups;
     }

@@ -46,11 +46,11 @@ export default function ExtensionElementsProvider(propertiesPanel, injector, tra
         console.log(groups)
         const calledElementTab = groups.find((e) => e.id === "CamundaPlatform__CallActivity");
 
-          const entries = calledElementTab.entries;
+        const entries = calledElementTab.entries;
 
-          if (element.businessObject.get('calledElement') !== undefined) {
-            entries.splice(1, 1, CallProps(element)[0]);
-          }
+        if (element.businessObject.get('calledElement') !== undefined) {
+          entries.splice(1, 1, CallProps(element)[0]);
+        }
 
       }
 
@@ -62,6 +62,7 @@ export default function ExtensionElementsProvider(propertiesPanel, injector, tra
 
         if (element.businessObject.scriptFormat == undefined || element.businessObject.scriptFormat == '') {
           element.businessObject.scriptFormat = 'JavaScript';
+
           /*
           console.log(element.businessObject);
           console.log(element.businessObject.get('scriptType'))
@@ -70,6 +71,18 @@ export default function ExtensionElementsProvider(propertiesPanel, injector, tra
           //$('#bio-properties-panel-scriptType').val('script').trigger();
           //console.log($('.bio-properties-panel-group').find('[data-group-id="group-CamundaPlatform__Script"]'))
           //$('.bio-properties-panel-group').find('[data-group-id="group-CamundaPlatform__Script"]').trigger('click')
+        }
+
+      }
+
+      // add the template for sequence flow choice
+      if (is(element, 'bpmn:SequenceFlow')) {
+        const conditionTab = groups.find((e) => e.id === "CamundaPlatform__Condition");
+
+        if (conditionTab) {
+          if (element.businessObject.conditionExpression) {
+            element.businessObject.conditionExpression.body = 'next(null, condition_here);'
+          }
         }
 
       }
@@ -83,7 +96,7 @@ export default function ExtensionElementsProvider(propertiesPanel, injector, tra
             element.businessObject.name = element.businessObject.eventDefinitions[0].signalRef.name;
             if (typeof element.label != 'undefined') {
               element.label.businessObject.name = element.businessObject.eventDefinitions[0].signalRef.name;
-              $(`.djs-element[data-element-id="${element.label.id}"] tspan`).text(element.businessObject.eventDefinitions[0].signalRef.name);
+              //$(`.djs-element[data-element-id="${element.label.id}"] tspan`).text(element.businessObject.eventDefinitions[0].signalRef.name);
             }
           }
           groups.splice(3, 0, createFameSignal(element, translate));

@@ -176,6 +176,7 @@ document.body.addEventListener('dragover', fileDrop('Open BPMN diagram', openFil
 
 async function downloadDiagram() {
   try {
+    scriptControl()
     const result = await modeler.saveXML({ format: true });
     const { xml } = result;
     download(xml, fileName, 'application/xml');
@@ -200,6 +201,17 @@ async function downloadSVG() {
     console.log(err);
   }
 }
+
+function scriptControl() {
+  const elementRegistry = modeler.get('elementRegistry');
+  elementRegistry.forEach(function(element) {
+    if(element.type && element.type == 'bpmn:ScriptTask' && element.businessObject.scriptFormat == 'JavaScript' && element.businessObject.script !== undefined) {
+      const oldScript = element.businessObject.script;
+      element.businessObject.script = oldScript + '\nnext();';
+    }
+  })
+} 
+
 
 // Init the connection with ROS
 rosConnect(document);
