@@ -1,6 +1,6 @@
 import CallProps from './parts/CallProps';
 
-import ObjectParametersProps from './parts/ObjProps';
+import ParametersProps from './parts/data/ParametersProps';
 
 import FameSignalProps from './parts/FameSignalProps';
 
@@ -92,7 +92,8 @@ export default function ExtensionElementsProvider(propertiesPanel, injector, tra
       }
 
       if (is(element, 'bpmn:DataObjectReference')) {
-        groups.splice(2, 0, createObjectParametersGroup(element, injector, translate));
+        //groups.splice(2, 0, createObjectParametersGroup(element, injector, translate));
+        groups.splice(2, 0, createParametersGroup(element, injector, translate));
       }
 
       console.log(element)
@@ -123,14 +124,27 @@ function createFameSignal(element, translate) {
   return fameGroup;
 }
 
+function createParametersGroup(element, injector, translate) {
+
+  // Create a group called "parameters".
+  const parametersGroup = {
+    id: 'parameters',
+    label: translate('Data parameters'),
+    component: ListGroup,
+    ...ParametersProps({ element, injector })
+  };
+
+  return parametersGroup;
+}
+
+/*
 function createObjectParametersGroup(element, injector, translate) {
 
   const objectParametersGroup = {
     id: 'ObjectParameters',
-    label: translate('ROS'),
-    component: ListGroup,
-    ...ObjectParametersProps({ element, injector })
+    label: translate('Data'),
+    entries: ObjectParametersProps({ element, injector })
   };
 
   return objectParametersGroup;
-}
+}*/

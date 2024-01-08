@@ -1,11 +1,12 @@
 import Ids from 'ids';
 
 import { getBusinessObject } from 'bpmn-js/lib/util/ModelUtil';
+import { useService } from 'bpmn-js-properties-panel';
 
 
 export function getParametersExtension(element) {
   const businessObject = getBusinessObject(element);
-  return getExtension(businessObject, 'dataObject:Parameters');
+  return getExtension(businessObject, 'data:parameters');
 }
 
 export function getSignalParametersExtension(element) {
@@ -56,7 +57,7 @@ export function createElement(elementType, properties, parent, factory) {
 }
 
 export function createParameters(properties, parent, bpmnFactory) {
-  return createElement('dataObject:Parameters', properties, parent, bpmnFactory);
+  return createElement('data:parameters', properties, parent, bpmnFactory);
 }
 
 export function createSignalParameters(properties, parent, bpmnFactory) {
@@ -75,4 +76,40 @@ export function nextId(prefix) {
   const ids = new Ids([32, 32, 1]);
 
   return ids.nextPrefixed(prefix);
+}
+
+/**
+ * Get the list of useful services
+ * @returns commandStack, translate, bpmnFactory, debounce
+ */
+export function getServices() {
+  const commandStack = useService('commandStack');
+  const translate = useService('translate');
+  const bpmnFactory = useService('bpmnFactory');
+  const debounce = useService('debounceInput');
+
+  return { commandStack, translate, bpmnFactory, debounce }
+}
+
+export function getExtensionElement(element, commandStack, bpmnFactory) {
+
+  const businessObject = getBusinessObject(element);
+  let extensionElements = businessObject.get('extensionElements');
+
+  // Create new extension element
+  if (!extensionElements) {
+    extensionElements = createElement(
+      'bpmn:ExtensionElements',
+      { values: [] },
+      businessObject,
+      bpmnFactory
+    );
+
+    commandStack.execute('element.updateModdleProperties', {
+      element,
+      moddleElement: businessObject,
+      properties: { extensionElements }
+    });
+  }
+  return extensionElements;
 }

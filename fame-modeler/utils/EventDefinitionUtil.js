@@ -94,7 +94,7 @@ export function isMessageSupported(element) {
 
 export function getParametersExtension(element) {
   const businessObject = getBusinessObject(element);
-  return getExtension(businessObject, 'magic:Parameters');
+  return getExtension(businessObject, 'data:parameters');
 }
 
 export function getParameters(element) {

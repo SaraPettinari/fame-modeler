@@ -1,3 +1,6 @@
+/**
+ * CANCELLABILE
+ */
 import {
     getBusinessObject
   } from 'bpmn-js/lib/util/ModelUtil';
