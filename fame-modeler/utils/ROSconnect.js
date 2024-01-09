@@ -69,11 +69,11 @@ export function rosPubProcess(modeler) {
     }
   }
 
-  // Handle bpmn publishing over the /bpmn_process topic
+  // Handle bpmn publishing over the /collaboration_diagram topic
   document.querySelector('#send-button').addEventListener('click', function (event) {
     const process_topic = new ROSLIB.Topic({
       ros,
-      name: "/bpmn_process",
+      name: "/collaboration_diagram",
       messageType: "std_msgs/String",
     });
 

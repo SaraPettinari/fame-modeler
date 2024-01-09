@@ -204,13 +204,14 @@ async function downloadSVG() {
 
 function scriptControl() {
   const elementRegistry = modeler.get('elementRegistry');
-  elementRegistry.forEach(function(element) {
-    if(element.type && element.type == 'bpmn:ScriptTask' && element.businessObject.scriptFormat == 'JavaScript' && element.businessObject.script !== undefined) {
+  elementRegistry.forEach(function (element) {
+    if (element.type && element.type == 'bpmn:ScriptTask' && element.businessObject.scriptFormat == 'JavaScript' && element.businessObject.script !== undefined) {
       const oldScript = element.businessObject.script;
-      element.businessObject.script = oldScript + '\nnext();';
+      if (!oldScript.includes('next()'))
+        element.businessObject.script = oldScript + '\nnext();';
     }
   })
-} 
+}
 
 
 // Init the connection with ROS
