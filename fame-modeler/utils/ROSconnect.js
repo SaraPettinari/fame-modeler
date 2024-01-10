@@ -56,7 +56,7 @@ export function rosSubElement() {
   });
   return dt_topic
 }
-  
+
 
 export function rosPubProcess(modeler) {
   // Export bpmn as string
@@ -90,7 +90,9 @@ export function rosPubProcess(modeler) {
       alert('Process published')
       console.log('Process published')
 
-      window.open('viewer.html')
+      sessionStorage.setItem('process', out);
+
+      window.open('viewer.html');      
     });
   })
 }
