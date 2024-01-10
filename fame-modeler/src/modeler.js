@@ -158,21 +158,20 @@ if (presentationMode) {
 }
 
 function openFile(files) {
-
-  // files = [ { name, contents }, ... ]
-
   if (!files.length) {
     return;
   }
-
-  hideMessage();
+  //hideMessage();
 
   fileName = files[0].name;
+  console.log(fileName)
+
 
   openDiagram(files[0].contents);
 }
 
 document.body.addEventListener('dragover', fileDrop('Open BPMN diagram', openFile), false);
+
 
 async function downloadDiagram() {
   try {
@@ -214,6 +213,39 @@ function scriptControl() {
 }
 
 
+const propertiesPanel = document.querySelector('#properties-panel');
+
+const propertiesPanelResizer = document.querySelector('#properties-panel-resizer');
+
+let startX, ì, stopX;
+
+function toggleProperties(open) {
+  propertiesPanel.classList.toggle('open', open);
+}
+
+propertiesPanelResizer.addEventListener('dblclick', function (event) {
+  toggleProperties(!propertiesPanel.classList.contains('open'));
+});
+
+propertiesPanelResizer.addEventListener('dragstart', function (event) {
+  startX = event.screenX;
+});
+
+//#TODO: improvements needed
+propertiesPanelResizer.addEventListener('dragend', function (event) {
+  stopX = event.screenX;
+  var width = 0;
+  if (startX < stopX) {
+    width = stopX - startX;
+  }
+  else {
+    width = startX - stopX;
+  }
+  propertiesPanel.style.width = open ? `${width}px` : null;
+
+  toggleProperties(open);
+});
+
 // Init the connection with ROS
 rosConnect(document);
 rosPubProcess(modeler);
@@ -241,6 +273,10 @@ document.querySelector('#svg-button').addEventListener('click', function (event)
   downloadSVG();
 });
 
+document.querySelector('#new-diagram').addEventListener('click', () => {
+  fileOpen().then(openFile);
+});
+
 const remoteDiagram = url.searchParams.get('diagram');
 
 if (remoteDiagram) {
@@ -265,89 +301,93 @@ if (remoteDiagram) {
   openDiagram(initialDiagram);
 }
 
-// --- QoS compatibility check --- //
-const modeling = modeler.get('modeling');
-const registry = modeler.get('elementRegistry');
+var qosCheck = document.getElementById('qos-check');
 
-/* Importing Rule Engine instance */
-const R = qosCompatibilityCheck()
+if (qosCheck.checked) {
+  // --- QoS compatibility check --- //
+  const modeling = modeler.get('modeling');
+  const registry = modeler.get('elementRegistry');
 
-modeler.on(['shape.removed'], (e) => {
-  e.stopPropagation();
-  e.preventDefault();
-  const element = e.element;
-});
+  /* Importing Rule Engine instance */
+  const R = qosCompatibilityCheck()
 
-
-/* Trigger QoS check every time a change occurs */
-modeler.on(['commandStack.element.updateProperties.postExecuted', 'commandStack.element.updateModdleProperties.postExecuted'], (e) => {
-  e.stopPropagation();
-  e.preventDefault();
-  if (e.context.properties.di) return; // if background changes exit
-
-  const element = e.context.element;
-  if (!pubOrSub(element)) return; // if not signal node exit
-  element.businessObject.incompatibilities = []; // reset incompatibilities
-  if (!element.businessObject.eventDefinitions[0].signalRef) {
-    modeling.setColor(registry.get(element.id), {
-      fill: "#fff"
-    }); // reset node color
-    return;
-  }
-  const signalName = element.businessObject.eventDefinitions[0].signalRef.name; // get signal topic name
-
-  var elements = registry.filter(function (element) {
-    return (
-      pubOrSub(element) &&
-      element.businessObject.eventDefinitions[0].signalRef &&
-      element.businessObject.eventDefinitions[0].signalRef.name == signalName
-    );
+  modeler.on(['shape.removed'], (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    const element = e.element;
   });
 
-  for (const i in elements) {
-    const source = elements[i];
-    const type = pubOrSub(source);
-    modeling.setColor(source, {
-      fill: "#33bb77"
-    }); // reset node color
 
-    elements.forEach(target => {
-      if (type == pubOrSub(target) || source.id == target.id) return;
-      source.businessObject.incompatibilities = [];
-      var communication = {
-        pub: type == "pub" ? source.businessObject : target.businessObject,
-        sub: type == "sub" ? source.businessObject : target.businessObject
-      };
-      R.execute(communication, (data) => {
-        if (data.result !== true) {
-          source.businessObject.incompatibilities.push({
-            "name": target.businessObject.name,
-            "reasons": data.reasons
-          });
-          modeling.setColor(source, {
-            fill: "#ff0000"
-          });
-          modeling.setColor(target, {
-            fill: "#ff0000"
-          });
-        }
-      });
+  /* Trigger QoS check every time a change occurs */
+  modeler.on(['commandStack.element.updateProperties.postExecuted', 'commandStack.element.updateModdleProperties.postExecuted'], (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    if (e.context.properties.di) return; // if background changes exit
+
+    const element = e.context.element;
+    if (!pubOrSub(element)) return; // if not signal node exit
+    element.businessObject.incompatibilities = []; // reset incompatibilities
+    if (!element.businessObject.eventDefinitions[0].signalRef) {
+      modeling.setColor(registry.get(element.id), {
+        fill: "#fff"
+      }); // reset node color
+      return;
+    }
+    const signalName = element.businessObject.eventDefinitions[0].signalRef.name; // get signal topic name
+
+    var elements = registry.filter(function (element) {
+      return (
+        pubOrSub(element) &&
+        element.businessObject.eventDefinitions[0].signalRef &&
+        element.businessObject.eventDefinitions[0].signalRef.name == signalName
+      );
     });
-  }
-});
+
+    for (const i in elements) {
+      const source = elements[i];
+      const type = pubOrSub(source);
+      modeling.setColor(source, {
+        fill: "#33bb77"
+      }); // reset node color
+
+      elements.forEach(target => {
+        if (type == pubOrSub(target) || source.id == target.id) return;
+        source.businessObject.incompatibilities = [];
+        var communication = {
+          pub: type == "pub" ? source.businessObject : target.businessObject,
+          sub: type == "sub" ? source.businessObject : target.businessObject
+        };
+        R.execute(communication, (data) => {
+          if (data.result !== true) {
+            source.businessObject.incompatibilities.push({
+              "name": target.businessObject.name,
+              "reasons": data.reasons
+            });
+            modeling.setColor(source, {
+              fill: "#ff0000"
+            });
+            modeling.setColor(target, {
+              fill: "#ff0000"
+            });
+          }
+        });
+      });
+    }
+  });
 
 
-modeler.on(['element.click'], (e) => {
-  let incompatibilities = e.element.businessObject.incompatibilities;
-  if (!incompatibilities || incompatibilities.length == 0)
-    document.getElementById("incompatibilities").innerHTML = null;
-  else {
-    let text = "";
-    incompatibilities.forEach(e => {
-      text += "<br>";
-      text += (e.name + ": ");
-      text += e.reasons;
-    })
-    document.getElementById("incompatibilities").innerHTML = "<div><b>INCOMPATIBILITIES!</b>" + text + "</div>";
-  }
-});
+  modeler.on(['element.click'], (e) => {
+    let incompatibilities = e.element.businessObject.incompatibilities;
+    if (!incompatibilities || incompatibilities.length == 0)
+      document.getElementById("incompatibilities").innerHTML = null;
+    else {
+      let text = "";
+      incompatibilities.forEach(e => {
+        text += "<br>";
+        text += (e.name + ": ");
+        text += e.reasons;
+      })
+      document.getElementById("incompatibilities").innerHTML = "<div><b>INCOMPATIBILITIES!</b>" + text + "</div>";
+    }
+  });
+}

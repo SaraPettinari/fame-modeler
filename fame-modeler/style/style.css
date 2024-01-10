@@ -2,6 +2,8 @@
 
 html,
 body,
+
+
 #canvas {
   width: 100%;
   height: 100%;
@@ -18,6 +20,7 @@ body:not(.presentation-mode) .bts-notifications {
   bottom: 60px;
 }
 
+
 .links,
 .drop-message {
   z-index: 1;
@@ -25,8 +28,11 @@ body:not(.presentation-mode) .bts-notifications {
 
 .top-links {
   position: absolute;
-  top: 24px;
+  color: #fff;
+  top: 14px;
   right: 24px;
+  font-size: 14px;
+
 }
 
 .bottom-links {
@@ -63,7 +69,7 @@ body:not(.presentation-mode) .bts-notifications {
 .canvas-parent {
   position: absolute;
   left: 0;
-  top: 0;
+  top: 50px;
   bottom: 0;
   right: 0;
 
@@ -89,7 +95,9 @@ body:not(.presentation-mode) .bts-notifications {
   border-left: solid 1px #CCC;
 }
 
+
 .properties-panel {
+  width: 350px;
   position: relative;
 }
 
@@ -111,7 +119,6 @@ body:not(.presentation-mode) .bts-notifications {
   bottom: 0;
   width: 22px;
   z-index: 3;
-
   cursor: e-resize;
 }
 
@@ -146,14 +153,15 @@ body:not(.presentation-mode) .bts-notifications {
 
 .drop-message {
   position: absolute;
-  top: 24px;
+  top: 8px;
   left: 50%;
   transform: translateX(-50%);
-  background-color: var(--token-simulation-silver-darken-94, #EFEFEF);
+  /*background-color: var(--token-simulation-silver-darken-94, #EFEFEF);*/
   border-radius: 2px;
   padding: 6px 12px;
   font-size: 16px;
-  color: var(--token-simulation-grey-darken-30, #212121);
+  /*color: var(--token-simulation-grey-darken-30, #212121);*/
+  color: #fff;
   user-select: none;
 }
 
@@ -206,4 +214,25 @@ body:not(.presentation-mode) .bts-notifications {
     font-size: 1.5rem;
     padding: 1rem;
   }
+}
+
+.topnav {
+  overflow: hidden;
+  background-color: #104dd0;
+}
+
+.upload {
+  background-color: transparent;
+  color: #fff;
+  border: transparent;
+}
+
+.upload:hover {
+  background-color: #fff;
+  color: #104dd0;
+}
+
+
+input[type=checkbox] {
+  accent-color: #fff;
 }
