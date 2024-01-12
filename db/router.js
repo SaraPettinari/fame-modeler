@@ -10,7 +10,10 @@ const express = require('express')
 const app = express()
 
 const cors = require('cors');
+const bodyParser = require('body-parser');
+
 app.use(cors());
+app.use(bodyParser.json());
 
 app.get('/messages', async (req, res) => {
     var listMessages = []
@@ -44,6 +47,16 @@ app.use(function (req, res, next) {
     }
 });
 
+
+app.post('/processes', async (req, res) => {
+    const newData = req.body;
+
+    var Processes = require('./models/process');
+    
+    await Processes.create(newData);
+
+    res.send({ process: "ok"})
+});
 
 app.listen(9000, () => {
     console.log("listening on port 9000")

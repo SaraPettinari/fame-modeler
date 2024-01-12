@@ -25,6 +25,10 @@ export function getSignalQoSExtension(element) {
   return getExtension(businessObject, 'qos:policy');
 }
 
+export function getCalledProcessExtension(element) {
+  const businessObject = getBusinessObject(element);
+  return getExtension(businessObject, 'callActivity:process');
+}
 
 export function getParameters(element) {
   const parameters = getParametersExtension(element);
@@ -70,6 +74,10 @@ export function createSignalTopic(properties, parent, bpmnFactory) {
 
 export function createSignalQoS(properties, parent, bpmnFactory) {
   return createElement('qos:policy', properties, parent, bpmnFactory);
+}
+
+export function createCalledProcess(properties, parent, bpmnFactory) {
+  return createElement('callActivity:process', properties, parent, bpmnFactory);
 }
 
 export function nextId(prefix) {

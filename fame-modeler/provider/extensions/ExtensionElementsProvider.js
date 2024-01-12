@@ -41,17 +41,25 @@ export default function ExtensionElementsProvider(propertiesPanel, injector, tra
      */
     return function (groups) {
 
+      if (is(element, 'bpmn:Participant')) {
+        var processName = element.businessObject.name
+        if (processName) { // assign the process reference id
+          element.businessObject.processRef.id = 'Process_' + processName
+
+          element.businessObject.processRef.isExecutable = true
+        }
+      }
 
       if (is(element, 'bpmn:CallActivity')) {
-        console.log(groups)
+        //console.log(groups)
         const calledElementTab = groups.find((e) => e.id === "CamundaPlatform__CallActivity");
 
         const entries = calledElementTab.entries;
 
         if (element.businessObject.get('calledElement') !== undefined) {
           entries.splice(1, 1, CallProps(element)[0]);
+          entries.push(CallProps(element)[1]);
         }
-
       }
 
       if (is(element, 'bpmn:ScriptTask')) {
@@ -149,15 +157,3 @@ function createParametersGroup(element, injector, translate) {
 
   return parametersGroup;
 }
-
-/*
-function createObjectParametersGroup(element, injector, translate) {
-
-  const objectParametersGroup = {
-    id: 'ObjectParameters',
-    label: translate('Data'),
-    entries: ObjectParametersProps({ element, injector })
-  };
-
-  return objectParametersGroup;
-}*/

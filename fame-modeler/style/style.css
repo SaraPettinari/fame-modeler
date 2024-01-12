@@ -236,3 +236,26 @@ body:not(.presentation-mode) .bts-notifications {
 input[type=checkbox] {
   accent-color: #fff;
 }
+
+.button-ca {
+  display: inline-block;
+  padding: 4px 8px; 
+  font-size: 14px; 
+  font-weight: bold;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  border-radius: 20px; 
+  background-color: #104dd0; 
+  color: #ffffff; 
+  border: 2px solid #104dd0; 
+
+  /* Add hover effect */
+  transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+}
+
+.button-ca:hover {
+  background-color: #ffffff; /* Change background color on hover */
+  color: #104dd0; /* Change text color on hover */
+  border-color: #ffffff; /* Change border color on hover */
+}

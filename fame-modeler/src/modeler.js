@@ -33,6 +33,7 @@ import camundaModdleDescriptors from 'camunda-bpmn-moddle/resources/camunda.json
 
 import { pubOrSub, qosCompatibilityCheck } from '../utils/QoSCheck';
 import { rosConnect, rosPubProcess } from '../utils/ROSconnect';
+import { storeCallAct } from '../utils/CallActivityStore';
 
 const url = new URL(window.location.href);
 
@@ -247,9 +248,10 @@ propertiesPanelResizer.addEventListener('dragend', function (event) {
 });
 
 // Init the connection with ROS
-rosConnect(document);
-rosPubProcess(modeler);
-
+if (document.getElementById('ros-button')) {
+  rosConnect(document);
+  rosPubProcess(modeler);
+}
 
 document.body.addEventListener('keydown', function (event) {
   if (event.code === 'KeyS' && (event.metaKey || event.ctrlKey)) {
@@ -301,9 +303,12 @@ if (remoteDiagram) {
   openDiagram(initialDiagram);
 }
 
+/**
+ * Quality of Service handler
+ */
 var qosCheck = document.getElementById('qos-check');
 
-if (qosCheck.checked) {
+if (qosCheck && qosCheck.checked) {
   // --- QoS compatibility check --- //
   const modeling = modeler.get('modeling');
   const registry = modeler.get('elementRegistry');
@@ -389,5 +394,15 @@ if (qosCheck.checked) {
       })
       document.getElementById("incompatibilities").innerHTML = "<div><b>INCOMPATIBILITIES!</b>" + text + "</div>";
     }
+  });
+}
+
+
+/**
+ * Call Activity handler
+ */
+if (document.getElementById('call-act-button')) {
+  document.querySelector('#call-act-button').addEventListener('click', function (event) {
+    storeCallAct(modeler)
   });
 }
