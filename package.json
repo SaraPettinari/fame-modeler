@@ -19,7 +19,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+TODO"
+    "url": "https://github.com/SaraPettinari/fame-modeler"
   },
   "author": {
     "name": "Sara Pettinari",
@@ -36,9 +36,9 @@
       "url": "https://github.com/Ruschio/c-qos"
     }
   ],
-  "license": "TODO",
+  "license": "GPL-3.0",
   "bugs": {
-    "url": "TODO"
+    "url": "https://github.com/SaraPettinari/fame-modeler/issues"
   },
   "homepage": "https://pros.unicam.it/fame",
   "files": [
@@ -91,6 +91,7 @@
     "csv": "^6.3.5",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
+    "fast-xml-parser": "^4.3.3",
     "fs": "^0.0.1-security",
     "fs-extra": "^11.1.1",
     "http": "^0.0.1-security",
@@ -102,6 +103,7 @@
     "mongoose": "^8.0.1",
     "node-rules": "^9.1.1",
     "randomcolor": "^0.6.2",
-    "roslib": "^1.3.0"
+    "roslib": "^1.3.0",
+    "xml-js": "^1.6.11"
   }
 }
