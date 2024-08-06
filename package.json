@@ -76,7 +76,7 @@
     "mocha-test-container-support": "^0.2.0",
     "node-polyfill-webpack-plugin": "^2.0.1",
     "npm-run-all": "^4.1.5",
-    "puppeteer": "^19.4.1",
+    "puppeteer": "^22.15.0",
     "rollup": "^2.79.1",
     "rollup-plugin-string": "^3.0.0",
     "sinon": "^10.0.0",
