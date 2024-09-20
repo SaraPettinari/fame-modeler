@@ -8,10 +8,30 @@
 npm install
 ```
 
-- Install ros2-web-bridge library see [documentation](https://github.com/RobotWebTools/rosbridge_suite).
+- Install ros2-web-bridge library see [documentation](https://github.com/RobotWebTools/rosbridge_suite) or run:
+```
+sudo apt install ros-<YOUR_DISTRO>-rosbridge-server
+```
 
+- Install MongoDB
+[Documentation](https://www.mongodb.com/docs/manual/tutorial/install-mongodb-on-ubuntu/)
+
+    Populate the DB
+    ```
+    npm run db-exec
+    ```
 
 ## Execute
+```
+source run.sh
+```
+
+
+**or**
+```
+sudo systemctl start mongod.service
+```
+
 ```
 npm run fame
 ```

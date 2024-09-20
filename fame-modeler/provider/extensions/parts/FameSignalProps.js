@@ -102,7 +102,7 @@ function FameSignalType(props) {
     // Create new extension element
     if (!extensionElements) {
       extensionElements = createElement(
-        'bpmn:ExtensionElements',
+        'bpmn:extensionElements',
         { values: [] },
         businessObject,
         bpmnFactory
@@ -113,11 +113,14 @@ function FameSignalType(props) {
         moddleElement: businessObject,
         properties: { extensionElements }
       });
+    } else {
+      // if the ROS message type is changed, clean previous values from the model
+      if(extensionElements.values.length > 0)
+        extensionElements.values = []
     }
 
     // Add ROS message type information
     let msg_extension = getSignalTopicExtension(element);
-    if (!msg_extension) {
 
       msg_extension = createSignalTopic({
         type: []
@@ -144,7 +147,7 @@ function FameSignalType(props) {
           type: value
         }
       });
-    }
+    
 
     element.businessObject.message_type = value
   }
@@ -213,7 +216,7 @@ function FameSignalMessage(props) {
 
     if (!extensionElements) {
       extensionElements = createElement(
-        'bpmn:ExtensionElements',
+        'bpmn:extensionElements',
         { values: [] },
         businessObject,
         bpmnFactory
@@ -244,7 +247,7 @@ function FameSignalMessage(props) {
         }
       });
 
-    }
+    } 
 
     if (extension.values.length > 0) {
       const parameters = extension.values.filter(value => value.name == id);

@@ -160,7 +160,7 @@ function Extension(props, policy, out_type, entries = undefined) {
      */
     if (!extensionElements) {
       extensionElements = createElement(
-        'bpmn:ExtensionElements',
+        'bpmn:extensionElements',
         { values: [] },
         businessObject,
         bpmnFactory

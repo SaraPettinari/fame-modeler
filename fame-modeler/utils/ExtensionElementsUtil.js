@@ -32,7 +32,7 @@ export function getExtensionElementsList(businessObject, type = undefined) {
 }
 
 /**
- * Add one or more extension elements. Create bpmn:ExtensionElements if it doesn't exist.
+ * Add one or more extension elements. Create bpmn:extensionElements if it doesn't exist.
  *
  * @param {ModdleElement} element
  * @param {ModdleElement} businessObject
@@ -44,10 +44,10 @@ export function addExtensionElements(element, businessObject, extensionElementTo
 
   let extensionElements = businessObject.get('extensionElements');
 
-  // (1) create bpmn:ExtensionElements if it doesn't exist
+  // (1) create bpmn:extensionElements if it doesn't exist
   if (!extensionElements) {
     extensionElements = createElement(
-      'bpmn:ExtensionElements',
+      'bpmn:extensionElements',
       {
         values: []
       },
@@ -85,7 +85,7 @@ export function addExtensionElements(element, businessObject, extensionElementTo
 }
 
 /**
- * Remove one or more extension elements. Remove bpmn:ExtensionElements afterwards if it's empty.
+ * Remove one or more extension elements. Remove bpmn:extensionElements afterwards if it's empty.
  *
  * @param {ModdleElement} element
  * @param {ModdleElement} businessObject

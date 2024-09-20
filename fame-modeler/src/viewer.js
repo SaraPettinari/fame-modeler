@@ -7,8 +7,7 @@ import fileDrop from 'file-drops';
 import fileOpen from 'file-open';
 
 
-import { rosInit, rosSubElement } from '../utils/ROSconnect';
-
+import { rosInit, rosSubElement, rosPubProcess } from '../utils/ROSconnect';
 
 const url = new URL(window.location.href);
 
@@ -90,3 +89,6 @@ sub_topic.subscribe((message) => {
   
 });
 
+document.getElementById('send-button').addEventListener('click', function(event){
+  rosPubProcess(viewer);
+})

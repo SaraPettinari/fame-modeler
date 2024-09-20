@@ -27,7 +27,7 @@ import fileOpen from 'file-open';
 
 import download from 'downloadjs';
 
-import exampleXML from '../resources/init.bpmn';
+import exampleXML from '../resources/rexdingo.bpmn';
 
 import camundaModdleDescriptors from 'camunda-bpmn-moddle/resources/camunda.json';
 

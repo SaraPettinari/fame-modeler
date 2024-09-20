@@ -28,7 +28,7 @@ export function rosConnect(document) {
     ros.on("connection", () => {
       document.getElementById("ros-button").style.background = '#104dd0';
       document.getElementById("ros-button").style.color = '#FFFFFF';
-      document.getElementById("ros-button").innerHTML = 'Connected with ROS'
+      document.getElementById("ros-button").innerHTML = '<i class="bi bi-robot"></i> Connected with ROS'
 
       document.getElementById("send-button").style.display = "inline"
     });

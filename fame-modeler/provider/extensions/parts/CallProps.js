@@ -60,7 +60,7 @@ function Call(props) {
     // Create new extension element
     if (!extensionElements) {
       extensionElements = createElement(
-        'bpmn:ExtensionElements',
+        'bpmn:extensionElements',
         { values: [] },
         businessObject,
         bpmnFactory

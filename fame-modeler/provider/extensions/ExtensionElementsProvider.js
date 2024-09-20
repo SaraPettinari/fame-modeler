@@ -45,7 +45,7 @@ export default function ExtensionElementsProvider(propertiesPanel, injector, tra
         var processName = element.businessObject.name
         if (processName) { // assign the process reference id
           element.businessObject.processRef.id = 'Process_' + processName
-
+          //element.businessObject.id = 'this_' + processName
           element.businessObject.processRef.isExecutable = true
         }
       }
