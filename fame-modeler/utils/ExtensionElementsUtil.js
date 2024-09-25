@@ -47,7 +47,7 @@ export function addExtensionElements(element, businessObject, extensionElementTo
   // (1) create bpmn:extensionElements if it doesn't exist
   if (!extensionElements) {
     extensionElements = createElement(
-      'bpmn:extensionElements',
+      'bpmn:ExtensionElements',
       {
         values: []
       },

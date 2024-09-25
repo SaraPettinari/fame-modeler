@@ -102,7 +102,7 @@ function FameSignalType(props) {
     // Create new extension element
     if (!extensionElements) {
       extensionElements = createElement(
-        'bpmn:extensionElements',
+        'bpmn:ExtensionElements',
         { values: [] },
         businessObject,
         bpmnFactory
@@ -216,7 +216,7 @@ function FameSignalMessage(props) {
 
     if (!extensionElements) {
       extensionElements = createElement(
-        'bpmn:extensionElements',
+        'bpmn:ExtensionElements',
         { values: [] },
         businessObject,
         bpmnFactory
