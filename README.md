@@ -33,7 +33,7 @@ sudo systemctl start mongod.service
 ```
 
 ```
-npm run fame
+npm start
 ```
 
 ```

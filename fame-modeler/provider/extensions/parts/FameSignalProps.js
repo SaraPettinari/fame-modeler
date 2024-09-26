@@ -34,6 +34,9 @@ export default function (element) {
   // Check if it is a throwing signal to add payload parameters
   if (is(element, 'bpmn:EndEvent') || is(element, 'bpmn:IntermediateThrowEvent')) {
 
+    console.log('this_state: ', useState())
+
+
     const [types, setMessages] = useState([]);
 
     useEffect(() => {

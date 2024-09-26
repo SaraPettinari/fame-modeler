@@ -1,49 +1,52 @@
-/* eslint-env node */
-
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const { DefinePlugin } = require('webpack');
 
-const NodePolyfillPlugin = require('node-polyfill-webpack-plugin')
+const path = require('path');
 
-
-module.exports = (env, argv) => {
-
-  const mode = argv.mode || 'development';
-
-  const devtool = mode === 'development' ? 'eval-source-map' : 'source-map';
-
-  return {
-    mode,
-    entry: {
-      viewer: './fame-modeler/src/viewer.js',
-      modeler: './fame-modeler/src/modeler.js'
-    },
-    output: {
-      filename: 'dist/[name].js',
-      path: __dirname + '/fame-modeler'
-    },
-    module: {
-      rules: [
-        {
-          test: /\.bpmn$/,
-          type: 'asset/source'
-        }
-      ]
-    },
-    plugins: [
-      new CopyWebpackPlugin({
-        patterns: [
-          { from: './assets', to: 'dist/vendor/bpmn-js-token-simulation/assets' },
-          { from: 'bpmn-js/dist/assets', context: 'node_modules', to: 'dist/vendor/bpmn-js/assets' },
-          { from: 'bpmn-js-properties-panel/dist/assets', context: 'node_modules', to: 'dist/vendor/bpmn-js-properties-panel/assets' }
+module.exports = {
+  mode: 'development',
+  entry: {
+    viewer: './fame-modeler/src/viewer.js',
+    modeler: './fame-modeler/src/modeler.js'
+  },
+  output: {
+    path: path.resolve(__dirname, 'fame-modeler'),
+    filename: '[name].js'
+  },
+  devtool: 'source-map',
+  module: {
+    rules: [
+      {
+        test: /\.less$/,
+        use: [
+          'style-loader',
+          'css-loader',
+          'less-loader',
+        ],
+      },
+      {
+        test: /\.css$/,
+        use: [
+          'style-loader',
+          'css-loader',
         ]
-      }),
-      new DefinePlugin({
-        'process.env.TOKEN_SIMULATION_VERSION': JSON.stringify(require('./package.json').version)
-      }),
-      new NodePolyfillPlugin(),
-    ],
-    devtool
-  };
-
+      },
+      {
+        test: /\.bpmn$/,
+        use: {
+          loader: 'raw-loader'
+        }
+      }
+    ]
+  },
+  plugins: [
+    new CopyWebpackPlugin({
+      patterns: [
+        { from: 'fame-modeler/index.html', to: '.' }
+      ]
+    }),
+    new DefinePlugin({
+      'process.env.TOKEN_SIMULATION_VERSION': JSON.stringify(require('./package.json').version)
+    })
+  ]
 };
