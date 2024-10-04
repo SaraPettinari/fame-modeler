@@ -18,7 +18,7 @@ sudo apt install ros-<YOUR_DISTRO>-rosbridge-server
 
     Populate the DB
     ```
-    npm run db-exec
+    npm run db-create
     ```
 
 ## Execute

@@ -4,14 +4,9 @@
   "description": "FaMe modeler for multi-robot system development based on bpmn-js toolkit",
   "main": "index.js",
   "scripts": {
-    "all": "run-s bundle:src lint test bundle",
-    "bundle:src": "rollup -c",
     "bundle": "webpack --mode production",
-    "bundle:watch": "webpack -w",
-    "db-exec": "cd db && node ./db.js",
+    "db-create": "cd db && node ./db.js",
     "exec": "cd db && node ./router.js",
-    "fame": "npm-run-all --parallel exec start:fame",
-    "start:fame": "webpack serve --static ./fame-modeler --open",   
     "dev": "webpack-dev-server --static=fame-modeler --open",
     "start": "npm-run-all --parallel exec dev"
   },
@@ -77,7 +72,9 @@
   },
   "dependencies": {
     "body-parser": "^1.20.2",
+    "bpmn-js-token-simulation": "^0.35.0",
     "cors": "^2.8.5",
+    "csv-parse": "^5.5.6",
     "express": "^4.21.0",
     "fast-xml-parser": "^4.5.0",
     "fs-extra": "^11.1.1",
