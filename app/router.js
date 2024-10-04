@@ -1,4 +1,6 @@
 var mongoose = require('mongoose');
+const { exec } = require('child_process');
+
 
 //var ROSLIB = require('roslib')
 
@@ -15,9 +17,11 @@ const bodyParser = require('body-parser');
 app.use(cors());
 app.use(bodyParser.json());
 
+// Import MongoDB data
+
 app.get('/messages', async (req, res) => {
     var listMessages = []
-    var Msg = require('./models/ros_msg');
+    var Msg = require('../db/models/ros_msg');
     await Msg.find().exec().then(result => {
         listMessages = result
 
@@ -27,7 +31,7 @@ app.get('/messages', async (req, res) => {
 
 app.get('/processes', async (req, res) => {
     var listProcesses = []
-    var Processes = require('./models/process');
+    var Processes = require('../db/models/process');
 
     await Processes.find().exec().then(result => {
         listProcesses = result
@@ -51,12 +55,32 @@ app.use(function (req, res, next) {
 app.post('/processes', async (req, res) => {
     const newData = req.body;
 
-    var Processes = require('./models/process');
+    var Processes = require('../db/models/process');
     
     await Processes.create(newData);
 
     res.send({ process: "ok"})
 });
+
+
+// Execute a bash command
+app.post('/run-command', (req, res) => {
+    const { command } = req.body;
+  
+    // Run the command
+    exec(command, (error, stdout, stderr) => {
+      if (error) {
+        return res.status(500).json({ error: error.message });
+      }
+  
+      if (stderr) {
+        return res.status(500).json({ error: stderr });
+      }
+  
+      // Send the stdout (command output) as a JSON response
+      res.json({ output: stdout });
+    });
+  });
 
 app.listen(9000, () => {
     console.log("listening on port 9000")

@@ -18,8 +18,8 @@ import qosModdleDescriptor from '../descriptors/qos';
 import customElementsProvider from '../provider/extensions';
 import callModdleDescriptor from '../descriptors/callActivity';
 import dataMoodleDescriptor from '../descriptors/dataObject';
-import signalDataMoodleDescriptor from '../descriptors/signalData';
-
+import rosDataMoodleDescriptor from '../descriptors/rosData';
+import customRendererProvider from '../provider/render/ServiceRendererProvider';
 
 import {
   BpmnPropertiesPanelModule,
@@ -40,6 +40,9 @@ import camundaModdleDescriptors from 'camunda-bpmn-moddle/resources/camunda.json
 import { pubOrSub, qosCompatibilityCheck } from '../utils/QoSCheck';
 import { rosConnect, rosPubProcess } from '../utils/ROSconnect';
 import { storeCallAct } from '../utils/CallActivityStore';
+import { createPools, runBackCommand } from './utils/scripts';
+import { backURL } from './utils/constants';
+
 
 const url = new URL(window.location.href);
 
@@ -48,6 +51,7 @@ const active = url.searchParams.has('e');
 const presentationMode = url.searchParams.has('pm');
 
 let fileName = 'diagram.bpmn';
+
 
 const initialDiagram = (() => {
   try {
@@ -75,41 +79,7 @@ function hideMessage() {
 if (persistent) {
   hideMessage();
 }
-/*
-const InitModule = {
-  __init__: [
-    ['eventBus', 'bpmnjs', 'toggleMode', function (eventBus, bpmnjs, toggleMode) {
 
-      if (persistent) {
-        eventBus.on('commandStack.changed', function () {
-          bpmnjs.saveXML().then(result => {
-            localStorage['diagram-xml'] = result.xml;
-          });
-        });
-      }
-
-      if ('history' in window) {
-        eventBus.on('tokenSimulation.toggleMode', event => {
-
-          document.body.classList.toggle('token-simulation-active', event.active);
-
-          if (event.active) {
-            url.searchParams.set('e', '1');
-          } else {
-            url.searchParams.delete('e');
-          }
-
-          history.replaceState({}, document.title, url.toString());
-        });
-      }
-
-      eventBus.on('diagram.init', 500, () => {
-        toggleMode.toggleMode(active);
-      });
-    }]
-  ]
-};
-*/
 
 const modeler = new BpmnModeler({
   container: '#canvas',
@@ -121,6 +91,7 @@ const modeler = new BpmnModeler({
     customElementsProvider,
     //TokenSimulationModule,
     AddExporter,
+    customRendererProvider
     //InitModule
   ],
   propertiesPanel: {
@@ -138,7 +109,7 @@ const modeler = new BpmnModeler({
     qos: qosModdleDescriptor,
     callActivity: callModdleDescriptor,
     dataObject: dataMoodleDescriptor,
-    signalData: signalDataMoodleDescriptor
+    signalData: rosDataMoodleDescriptor
   }
 });
 
@@ -285,6 +256,30 @@ document.querySelector('#new-diagram').addEventListener('click', () => {
   fileOpen().then(openFile);
 });
 
+document.querySelector('#generate-diagram').addEventListener('click', () => {
+  var participants = new Set();
+
+  let command = 'ros2 node list'
+  let url = backURL + '/run-command'
+
+  runBackCommand(command, url)
+    .then(result => {
+      var nodes = result.split('\n');
+
+      nodes.forEach(element => {
+        var node = element.split('/').filter(i => i);
+        if (node.length > 1) {
+          participants.add(node[0]);
+        }
+      })
+      console.log([...participants])
+      createPools(modeler, [...participants])
+    })
+    .catch(error => {
+      console.error('Failed to get elements', error);
+    });
+})
+
 const remoteDiagram = url.searchParams.get('diagram');
 
 if (remoteDiagram) {
@@ -412,3 +407,4 @@ if (document.getElementById('call-act-button')) {
     storeCallAct(modeler)
   });
 }
+

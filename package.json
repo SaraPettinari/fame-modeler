@@ -6,7 +6,7 @@
   "scripts": {
     "bundle": "webpack --mode production",
     "db-create": "cd db && node ./db.js",
-    "exec": "cd db && node ./router.js",
+    "exec": "cd app && node ./router.js",
     "dev": "webpack-dev-server --static=fame-modeler --open",
     "start": "npm-run-all --parallel exec dev"
   },
@@ -73,8 +73,10 @@
   "dependencies": {
     "body-parser": "^1.20.2",
     "bpmn-js-token-simulation": "^0.35.0",
+    "child_process": "^1.0.2",
     "cors": "^2.8.5",
     "csv-parse": "^5.5.6",
+    "diagram-js": "^14.11.3",
     "express": "^4.21.0",
     "fast-xml-parser": "^4.5.0",
     "fs-extra": "^11.1.1",

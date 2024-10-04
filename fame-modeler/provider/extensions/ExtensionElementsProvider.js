@@ -4,6 +4,8 @@ import ParametersProps from './parts/data/ParametersProps';
 
 import FameSignalProps from './parts/FameSignalProps';
 
+import ServiceProps from './parts/ServiceProps'
+
 import { is } from 'bpmn-js/lib/util/ModelUtil';
 
 import { ListGroup } from '@bpmn-io/properties-panel';
@@ -40,6 +42,15 @@ export default function ExtensionElementsProvider(propertiesPanel, injector, tra
      * @return {Object[]} modified groups
      */
     return function (groups) {
+
+      groups = groups.filter(el =>
+      (el.id.includes('Condition') ||
+        !el.id.includes('Camunda') ||
+        el.id.includes('CallActivity') ||
+        el.id.includes('Script') ||
+        el.id.includes('Implementation')
+      )); //excludes unused panels and keep only the used ones
+
 
       if (is(element, 'bpmn:Participant')) {
         var processName = element.businessObject.name
@@ -81,6 +92,23 @@ export default function ExtensionElementsProvider(propertiesPanel, injector, tra
           //$('.bio-properties-panel-group').find('[data-group-id="group-CamundaPlatform__Script"]').trigger('click')
         }
 
+      }
+
+      if (is(element, 'bpmn:ServiceTask')) {
+
+        const serviceTab = groups.find((e) => e.id === "CamundaPlatform__Implementation");
+
+        //console.log('service', Object.keys(serviceTab))
+
+        if (Object.keys(serviceTab).includes('entries')) {
+          var ent = serviceTab.entries
+          if (ent.length == 1) { // if user selected the <none> option
+            element.businessObject.isROService = true
+            groups.splice(3, 0, createROService(element, translate));
+          } else {
+            element.businessObject.isROService = false
+          }
+        }
       }
 
       // add the template for sequence flow choice
@@ -156,4 +184,15 @@ function createParametersGroup(element, injector, translate) {
   };
 
   return parametersGroup;
+}
+
+function createROService(element, translate) {
+
+  const fameGroup = {
+    id: 'fameService',
+    label: translate('ROS'),
+    entries: ServiceProps(element)
+  };
+
+  return fameGroup;
 }

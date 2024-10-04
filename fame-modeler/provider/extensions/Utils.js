@@ -19,6 +19,15 @@ export function getSignalTopicExtension(element) {
   return getExtension(businessObject, 'ros:message');
 }
 
+export function getServiceExtension(element) {
+  const businessObject = getBusinessObject(element);
+  return getExtension(businessObject, 'ros:service');
+}
+
+export function getServiceDataExtension(element) {
+  const businessObject = getBusinessObject(element);
+  return getExtension(businessObject, 'ros:payload');
+}
 
 export function getSignalQoSExtension(element) {
   const businessObject = getBusinessObject(element);
@@ -70,6 +79,14 @@ export function createSignalParameters(properties, parent, bpmnFactory) {
 
 export function createSignalTopic(properties, parent, bpmnFactory) {
   return createElement('ros:message', properties, parent, bpmnFactory);
+}
+
+export function createService(properties, parent, bpmnFactory) {
+  return createElement('ros:service', properties, parent, bpmnFactory);
+}
+
+export function createServiceData(properties, parent, bpmnFactory) {
+  return createElement('ros:payload', properties, parent, bpmnFactory);
 }
 
 export function createSignalQoS(properties, parent, bpmnFactory) {
