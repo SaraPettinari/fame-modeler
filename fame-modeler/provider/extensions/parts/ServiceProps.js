@@ -19,6 +19,8 @@ import {
     getServiceExtension,
     getServiceDataExtension
 } from '../Utils';
+import { backURL } from '../../../src/utils/constants';
+import { runBackCommand } from '../../../src/utils/scripts';
 
 
 var services = ''
@@ -37,8 +39,6 @@ export default function (element) {
         component: ServiceMessage,
         isEdited: isSelectEntryEdited
     }];
-
-
     return entries;
 }
 
@@ -138,22 +138,13 @@ function ServiceType(props) {
             ros.on('connection', () => {
                 console.log('Connected to ROS server.');
 
-                const backURL = 'http://localhost:9000';
+                let command = 'ros2 service list -t'
+                let url = backURL + '/run-command'
 
-                // Get the list of available services
-                fetch(backURL + '/run-command', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        command: 'ros2 service list -t' // get ROS services and types
-                    })
-                })
-                    .then(response => response.json())
+                runBackCommand(command, url)
                     .then(data => {
 
-                        services = data.output.trim().split('\n').map(line => {
+                        services = data.trim().split('\n').map(line => {
                             const [name, type] = line.split(' [');
 
                             return {
@@ -161,9 +152,7 @@ function ServiceType(props) {
                                 type: type.replace(']', '').trim() // Remove the closing bracket and trim any whitespace
                             };
                         });
-                        //console.log('services', services);
                         setServices(services) //set services list
-
                     })
                     .catch(error => {
                         console.error('Error:', error);
@@ -198,6 +187,7 @@ function ServiceType(props) {
   />`
 }
 
+
 function ServiceMessage(props) {
 
     const { element, id } = props;
@@ -206,81 +196,122 @@ function ServiceMessage(props) {
     const commandStack = useService('commandStack');
     const bpmnFactory = useService('bpmnFactory');
 
+    const [dynamicProperties, setDynamicProperties] = useState([]);
+    const [fieldValues, setFieldValues] = useState({});
 
-    const setValue = (value) => {
+    const curr_service = element.businessObject.service_type
+
+    const initializeValues = (properties) => {
+        const initialValues = {};
+        properties.forEach(prop => {
+            initialValues[prop.name] = prop.default;
+        });
+        setFieldValues(initialValues);
+    };
+
+    useEffect(() => {
+        if (curr_service) {
+            async function fetchProperties() {
+                try {
+                    const properties = await getDynamicProperties(curr_service);
+                    setDynamicProperties(properties);
+                    initializeValues(properties); // Initialize field values
+                } catch (error) {
+                    console.error('Error in retrieving service properties:', error);
+                }
+            }
+            fetchProperties();
+        }
+    }, [curr_service]);
+
+
+
+
+    // Function to dynamically update the value of a specific field
+    const setValue = (fieldName, value) => {
+        setFieldValues(prevValues => ({
+            ...prevValues,
+            [fieldName]: value
+        }));
+        const compositeValue = { ...fieldValues, [fieldName]: value };
+        var payload_value = JSON.stringify(compositeValue)
+
         const businessObject = getBusinessObject(element);
         let extensionElements = businessObject.get('extensionElements');
-
-        // Create new extension element
-        if (!extensionElements) {
-            extensionElements = createElement(
-                'bpmn:ExtensionElements',
-                { values: [] },
-                businessObject,
-                bpmnFactory
-            );
-
-            commandStack.execute('element.updateModdleProperties', {
-                element,
-                moddleElement: businessObject,
-                properties: { extensionElements }
-            });
-        } else {
-            if(extensionElements.values.length > 0)
-                extensionElements.values = []
-        }
 
         // Add ROS service payload
         let srv_extension = getServiceDataExtension(element);
 
-        srv_extension = createServiceData({
-            data: '',
-        }, extensionElements, bpmnFactory);
+        if (!srv_extension) {
+            srv_extension = createServiceData({
+                data: '',
+            }, extensionElements, bpmnFactory);
+
+            commandStack.execute('element.updateModdleProperties', {
+                element,
+                moddleElement: extensionElements,
+                properties: {
+                    values: [...extensionElements.get('values'), srv_extension]
+                }
+            });
+            createElement('ros:payload', {
+                data: payload_value
+            }, srv_extension, bpmnFactory);
+        }
 
 
-
-        commandStack.execute('element.updateModdleProperties', {
-            element,
-            moddleElement: extensionElements,
-            properties: {
-                values: [...extensionElements.get('values'), srv_extension]
-            }
-        });
-
-        createElement('ros:payload', {
-            data: value
-        }, srv_extension, bpmnFactory);
 
         commandStack.execute('element.updateModdleProperties', {
             element,
             moddleElement: srv_extension,
             properties: {
-                data: value
+                data: payload_value
             }
         });
-        element.businessObject.service_payload = value
-    }
 
-    const getValue = () => {
-        if (!element.businessObject.service_payload)
-            element.businessObject.service_payload = ''
-
-
-        return element.businessObject.service_payload;
+        // Store the payload as a JSON string in the business object
+        element.businessObject.service_payload = payload_value;
     };
 
-    function getLabel() {
-        return element.businessObject.service_type || 'select_service';
-    }
+    // Function to get the current value of each dynamic field
+    const getValue = (fieldName) => {
+        return fieldValues[fieldName] || '';
+    };
 
-    var type = getLabel()
-
-    return html`<${TextFieldEntry}
-  element=${element}
-  id=${id}
-  label=${translate(type)}
-  getValue=${getValue}
-  setValue=${setValue}
-  debounce=${debounce}
-  />`
+    // Dynamically render input fields based on the dynamic properties
+    return html`<div>
+        ${dynamicProperties.map((property) => html`
+            <${TextFieldEntry}
+                element=${element}
+                id=${id + '_' + property.name}
+                label=${translate(property.name + ' (' + property.type + ')')}
+                getValue=${() => getValue(property.name)}
+                setValue=${value => setValue(property.name, value)}
+                debounce=${debounce}
+            />
+        `)}
+    </div>`;
 }
+
+
+async function getDynamicProperties(curr_service) {
+    const command = `ros2 interface show ${curr_service}`;
+    const url = `${backURL}/run-command`;
+
+    try {
+        const data = await runBackCommand(command, url);
+        const fields = data.trim().split('---')[0].split('\n').filter(i => i);
+
+        // Map over the fields to construct an array of properties
+        const result = fields.map(field => {
+            const [type, name] = field.split(' ');
+            return { name, type, default: '' };
+        });
+
+        return result;
+    } catch (error) {
+        console.error('Error fetching properties:', error);
+        return [];
+    }
+}
+
