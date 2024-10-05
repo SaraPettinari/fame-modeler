@@ -1,7 +1,7 @@
 {
   "name": "fame-modeler",
-  "version": "0.1.5",
-  "description": "FaMe modeler for multi-robot system development based on bpmn-js toolkit",
+  "version": "0.2.0",
+  "description": "FaMe modeler for robotic systems development based on bpmn-js toolkit",
   "main": "index.js",
   "scripts": {
     "bundle": "webpack --mode production",
